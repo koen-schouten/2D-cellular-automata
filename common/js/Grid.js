@@ -14,8 +14,8 @@ const svgGrid = (function(){
     //look at different parts of the grid.
     const viewBox = { minX: 0,
         minY: 0,
-        width: 100,
-        height: 100
+        width: 0,
+        height: 0
     }
 
     function viewBoxToString(){
@@ -29,6 +29,7 @@ const svgGrid = (function(){
         viewBox.height = height;
 
         svgElement.setAttribute("viewBox", viewBoxToString())
+        updateTiles();
     }
 
     function getViewBox(){
@@ -54,7 +55,32 @@ const svgGrid = (function(){
     }
 
     function updateTiles(){
-        
+        tiles.forEach(tile=>{
+            if(isTileVisible(tile.x, tile.y)){
+                tile.appendHTMLElementToDom()
+            }else{
+                tile.removeHTMLElementFromDom()
+            }
+        })
+    }
+
+    function isTileVisible(x, y){
+        let left = viewBox.minX;
+        let top = viewBox.minY;
+        let right = viewBox.minX + viewBox.width;
+        let bottom = viewBox.minY + viewBox.height;
+
+        let tileWidth = 100 / getWidth()
+        let tileHeight = 100 / getHeigth()
+        let tileXpos = x * tileWidth;
+        let tileYpos = y * tileHeight;
+
+        if(tileXpos + tileWidth> left && tileXpos < right && tileYpos + tileHeight > top && tileYpos < bottom){
+            return true;
+        }
+        else{
+            return false;
+        }
 
     }
 

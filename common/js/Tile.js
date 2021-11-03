@@ -2,7 +2,7 @@ export class Tile{
     rectElement;
 
 
-    constructor(x, y, grid, strokeWidth="0.1", strokeColor="#000", fillColor="#fff"){
+    constructor(x, y, grid, strokeWidth="0.01", strokeColor="#000", fillColor="#fff"){
         this.x = x;
         this.y = y;
         this.strokeWidth = strokeWidth
@@ -14,7 +14,6 @@ export class Tile{
 
     createHTMLElement(){
         this.rectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        let svgElement = this.grid.getSVGElement();
 
         this.rectElement.setAttribute("data-gridX", this.x)
         this.rectElement.setAttribute("data-gridY", this.y)
@@ -26,7 +25,10 @@ export class Tile{
         this.rectElement.setAttribute("stroke", this.strokeColor)
         this.rectElement.setAttribute("stroke-width", this.strokeWidth)
         this.rectElement.setAttribute("fill", this.fillColor)
+    }
 
+    appendHTMLElementToDom(){
+        let svgElement = this.grid.getSVGElement();
         svgElement.appendChild(this.rectElement);
     }
 
@@ -34,6 +36,10 @@ export class Tile{
         this.rectElement.setAttribute("stroke", this.strokeColor)
         this.rectElement.setAttribute("stroke-width", this.strokeWidth)
         this.rectElement.setAttribute("fill", this.fillColor)
+    }
+
+    removeHTMLElementFromDom(){
+        this.rectElement.remove();
     }
 
     setFillColor(color){

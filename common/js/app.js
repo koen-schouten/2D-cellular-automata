@@ -2,8 +2,10 @@ import {svgGrid} from './Grid.js';
 
 function init(){
     const gridHolderElement = document.getElementById("gridHolder");
-    svgGrid.init(gridHolderElement, 100 , 100);
+    svgGrid.init(gridHolderElement, 200 , 200);
     addDragListener(svgGrid);
+
+    svgGrid.updateViewBox(50, 50, 5, 5);
 }
 
 
@@ -39,6 +41,8 @@ function addDragListener(svgGrid){
         }
     })
     svg.addEventListener("mouseup", event => {dragging = false})
+
+    svg.addEventListener("mouseleave", event => {dragging = false})
 }
 
 
