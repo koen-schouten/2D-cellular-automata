@@ -1,28 +1,29 @@
-import {Tile} from "./Tile.js"
+import { Tile } from "./Tile.js"
 
-const svgGrid = (function(){
+const svgGrid = (function () {
     let svgElement;
     let gridHolderElement;
     let width;
     let height;
 
-    const tiles = new Array(); 
+    const tiles = new Array();
 
     //A percentage based ViewBox for the svg is used.
     //The full grid has a viewbox of 100 by 100.
     //By changing the viewbox we can zoom in or out and 
     //look at different parts of the grid.
-    const viewBox = { minX: 0,
+    const viewBox = {
+        minX: 0,
         minY: 0,
         width: 0,
         height: 0
     }
 
-    function viewBoxToString(){
+    function viewBoxToString() {
         return `${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
     }
 
-    function updateViewBox(minX, minY, width, height){
+    function updateViewBox(minX, minY, width, height) {
         viewBox.minX = minX;
         viewBox.minY = minY;
         viewBox.width = width;
@@ -32,11 +33,11 @@ const svgGrid = (function(){
         updateTiles();
     }
 
-    function getViewBox(){
+    function getViewBox() {
         return viewBox;
     }
 
-    function init(element, horizontalTileCount, verticalTileCount){
+    function init(element, horizontalTileCount, verticalTileCount) {
         gridHolderElement = element;
         width = horizontalTileCount;
         height = verticalTileCount;
@@ -44,27 +45,27 @@ const svgGrid = (function(){
         initTiles();
     }
 
-    function initSVGElement(){
+    function initSVGElement() {
         svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svgElement.setAttribute("viewBox", viewBoxToString())
         gridHolderElement.appendChild(svgElement)
     }
 
-    function getSVGElement(){
+    function getSVGElement() {
         return svgElement;
     }
 
-    function updateTiles(){
-        tiles.forEach(tile=>{
-            if(isTileVisible(tile.x, tile.y)){
+    function updateTiles() {
+        tiles.forEach(tile => {
+            if (isTileVisible(tile.x, tile.y)) {
                 tile.appendHTMLElementToDom()
-            }else{
+            } else {
                 tile.removeHTMLElementFromDom()
             }
         })
     }
 
-    function isTileVisible(x, y){
+    function isTileVisible(x, y) {
         let left = viewBox.minX;
         let top = viewBox.minY;
         let right = viewBox.minX + viewBox.width;
@@ -75,47 +76,52 @@ const svgGrid = (function(){
         let tileXpos = x * tileWidth;
         let tileYpos = y * tileHeight;
 
-        if(tileXpos + tileWidth> left && tileXpos < right && tileYpos + tileHeight > top && tileYpos < bottom){
+        if (tileXpos + 2 * tileWidth > left &&
+            tileXpos < right &&
+            tileYpos + 2 * tileHeight > top &&
+            tileYpos < bottom) {
             return true;
         }
-        else{
+        else {
             return false;
         }
 
     }
 
-    function initTiles(){
+    function initTiles() {
         let tile;
-        for(let x = 0; x < width; x++){
-            for(let y = 0; y < height; y++){
-                tile = new Tile(x, y , svgGrid)
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                tile = new Tile(x, y, svgGrid)
                 tiles.push(tile);
             }
         }
     }
 
-    function getTile(x, y){
+    function getTile(x, y) {
         return tiles[x + y * width]
     }
 
-    function getWidth(){
+    function getWidth() {
         return width;
     }
 
-    function getHeigth(){
+    function getHeigth() {
         return height;
     }
 
 
 
 
-    return {init: init,
-            getWidth: getWidth,
-            getHeigth: getHeigth,
-            getSVGElement: getSVGElement,
-            updateViewBox: updateViewBox,
-            getViewBox: getViewBox}
+    return {
+        init: init,
+        getWidth: getWidth,
+        getHeigth: getHeigth,
+        getSVGElement: getSVGElement,
+        updateViewBox: updateViewBox,
+        getViewBox: getViewBox
+    }
 })();
 
 
-export {svgGrid}
+export { svgGrid }
