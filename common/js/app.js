@@ -1,12 +1,14 @@
 import { svgGrid } from './Grid.js';
 
+const gridSize = 100;
+
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");
-    svgGrid.init(gridHolderElement, 100, 100);
+    svgGrid.init(gridHolderElement, gridSize, gridSize);
     addDragListener(svgGrid);
     addZoomListeners(svgGrid);
 
-    svgGrid.updateViewBox(50, 50, 5, 5);
+    svgGrid.updateViewBox(50, 50, gridSize/10, gridSize/10);
 }
 
 
@@ -20,7 +22,7 @@ function addZoomListeners(svgGrid) {
 
     svg.addEventListener("wheel", event => {
         event.preventDefault();
-        console.log(event.deltaY);
+        let zoomSpeed = 1.25;
         pt.x = event.clientX;
         pt.y = event.clientY;
 
@@ -33,27 +35,30 @@ function addZoomListeners(svgGrid) {
             let centerX = cursorpt.x;
             let centerY = cursorpt.y;
 
-            let newWidth = svgViewBox.width / 2;
-            let newHeight = svgViewBox.height / 2;
+            let newWidth = svgViewBox.width / zoomSpeed;
+            let newHeight = svgViewBox.height / zoomSpeed;
 
             svgGrid.updateViewBox(centerX - newWidth / 2,
                 centerY - newHeight / 2,
                 newWidth,
                 newHeight)
-
         }
         //zoom out
         if (event.deltaY > 0) {
-            //zoom should happen around mouse position in viewbox.
-            let centerX = cursorpt.x;
-            let centerY = cursorpt.y;
+            //zoom should happen around old center
+            let centerX = (svgViewBox.minX + svgViewBox.width)/2 ;
+            let centerY = (svgViewBox.minY + svgViewBox.height)/2;
 
-            let newWidth = svgViewBox.width * 2;
-            let newHeight = svgViewBox.height * 2;
-            svgGrid.updateViewBox(centerX - newWidth / 2,
-                centerY - newHeight / 2,
-                newWidth,
-                newHeight)
+            let newWidth = svgViewBox.width * zoomSpeed;
+            let newHeight = svgViewBox.height * zoomSpeed;
+
+            //Limit the zoom to 100%
+            if(newWidth <= 100 && newHeight <= 100){
+                svgGrid.updateViewBox(centerX - newWidth / 2,
+                    centerY - newHeight / 2 ,
+                    newWidth,
+                    newHeight)
+            }
         }
     })
 }
@@ -91,7 +96,9 @@ function addDragListener(svgGrid) {
             let cursorpt = pt.matrixTransform(svg.getScreenCTM().inverse());
             let newX = svgViewBox.minX - (cursorpt.x - startX);
             let newY = svgViewBox.minY - (cursorpt.y - startY);
-            svgGrid.updateViewBox(newX, newY, svgViewBox.width, svgViewBox.height)
+            console.time('Execution Time');
+            svgGrid.updateViewBox(newX, newY, svgViewBox.width, svgViewBox.height);
+            console.timeEnd('Execution Time');
         }
     })
     svg.addEventListener("mouseup", event => { dragging = false })
