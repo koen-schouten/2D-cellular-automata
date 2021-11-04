@@ -64,9 +64,9 @@ const svgGrid = (function () {
         return svgElement;
     }
 
-    function removeAllInvisilbeTilesfromDom(){
-        for (let tile of visibleTiles){
-            if(!isTileVisible(tile.x, tile.y)){
+    function removeAllInvisilbeTilesfromDom() {
+        for (let tile of visibleTiles) {
+            if (!isTileVisible(tile.x, tile.y)) {
                 tile.removeHTMLElementFromDom();
                 visibleTiles.delete(tile);
 
@@ -82,46 +82,46 @@ const svgGrid = (function () {
     function updateTiles(oldViewBox) {
         const zoomedIn = oldViewBox.width > viewBox.width && oldViewBox.height > viewBox.width
         const zoomedOut = oldViewBox.width < viewBox.width && oldViewBox.height < viewBox.width
-        const zoomed = zoomedIn||zoomedOut;
+        const zoomed = zoomedIn || zoomedOut;
 
         const dx = viewBox.minX - oldViewBox.minX
-        const dy =  viewBox.minY - oldViewBox.minY
+        const dy = viewBox.minY - oldViewBox.minY
 
-        function UpdateTileBlock(minX, maxX, minY, maxY, func){
-            for(let x = minX; x <= maxX; x++){
-                for(let y = minY; y <= maxY; y++){
+        function UpdateTileBlock(minX, maxX, minY, maxY, func) {
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
                     let tile = getTile(x, y)
                     func(tile)
                 }
             }
         }
 
-        function addTileToDom(tile){
-            if(!visibleTiles.has(tile)){
+        function addTileToDom(tile) {
+            if (!visibleTiles.has(tile)) {
                 //Only add tiles when they aren't in the visible tiles set
                 tile.appendHTMLElementToDom()
                 visibleTiles.add(tile);
             }
         }
 
-        function removeTileFromDom(tile){
-            if(visibleTiles.has(tile)){
+        function removeTileFromDom(tile) {
+            if (visibleTiles.has(tile)) {
                 tile.removeHTMLElementFromDom()
                 visibleTiles.delete(tile);
             }
         }
 
-        if(zoomedIn){
+        if (zoomedIn) {
             //When zooming in only old tiles have to be removed. No new tiles will be visible
             removeAllInvisilbeTilesfromDom();
-        }else if(zoomedOut){
+        } else if (zoomedOut) {
             //When zooming out we only add new tiles. Only new tiles become visible. 
             //We don't have to remove old tiles.
             let tileWidth = 100 / getWidth()
             let tileHeight = 100 / getHeigth()
 
             let minX = viewBox.minX;
-            let maxX = viewBox.minX + viewBox.width; 
+            let maxX = viewBox.minX + viewBox.width;
             let minY = viewBox.minY;
             let maxY = viewBox.minY + viewBox.height;
 
@@ -129,19 +129,19 @@ const svgGrid = (function () {
 
             let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
             let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
-            let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
+            let newTopmostTile = Math.max(0, Math.floor(minY / tileHeight));
             let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
 
-            UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
+            UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
 
-        }else if(!zoomed){
+        } else if (!zoomed) {
             //When we are not zooming. We are moving. In that case we need to check how far we moved
             //and update the tile that gets shifted in and out of view.
             let tileWidth = 100 / getWidth()
             let tileHeight = 100 / getHeigth()
 
             let minX = viewBox.minX;
-            let maxX = viewBox.minX + viewBox.width; 
+            let maxX = viewBox.minX + viewBox.width;
             let minY = viewBox.minY;
             let maxY = viewBox.minY + viewBox.height;
 
@@ -150,58 +150,58 @@ const svgGrid = (function () {
 
             let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
             let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
-            let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
+            let newTopmostTile = Math.max(0, Math.floor(minY / tileHeight));
             let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
 
             let oldLeftmostTile = Math.max(0, Math.floor(oldViewBox.minX / tileWidth));
             let oldRightmostTile = Math.min(width - 1, Math.ceil(oldMaxX / tileWidth));
-            let oldTopmostTile =  Math.max(0, Math.floor(oldViewBox.minY / tileHeight));
+            let oldTopmostTile = Math.max(0, Math.floor(oldViewBox.minY / tileHeight));
             let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
 
 
-            if(dx <= 0 && dy <= 0){
+            if (dx <= 0 && dy <= 0) {
                 //shift to top left
                 //update top
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,oldTopmostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
                 //update left
-                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom)
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile - 1 ,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom)
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
-            }else if(dx <= 0 && dy >= 0){
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
+            } else if (dx <= 0 && dy >= 0) {
                 //shift to bottom left
                 //update bottom
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
                 //update left
-                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom)
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile -1,newTopmostTile - 1,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom)
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
-            }else if(dx >= 0 && dy >= 0){
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
+            } else if (dx >= 0 && dy >= 0) {
                 //shift to bottom right
                 //update bottom
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
                 //update right
-                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1,newTopmostTile -1 ,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom)
                 //remove left
-                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile -1 ,removeTileFromDom)
-            }else if(dx >= 0 && dy <= 0){
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile - 1, removeTileFromDom)
+            } else if (dx >= 0 && dy <= 0) {
                 //shift to top right
                 //update top
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,oldTopmostTile ,addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
                 //update right
-                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
                 //remove left
-                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile - 1,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom)
             }
         }
-        
+
     }
 
     function isTileVisible(x, y) {
