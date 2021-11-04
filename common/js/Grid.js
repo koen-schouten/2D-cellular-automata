@@ -143,240 +143,76 @@ const svgGrid = (function () {
             let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
 
 
+            function UpdateTileBlock(minX, maxX, minY, maxY, func){
+                for(let x = minX; x <= maxX; x++){
+                    for(let y = minY; y <= maxY; y++){
+                        let tile = getTile(x, y)
+                        func(tile)
+                    }
+                }
+            }
+
+            function addTileToDom(tile){
+                if(!visibleTiles.has(tile)){
+                    //Only add tiles when they aren't in the visible tiles set
+                    tile.appendHTMLElementToDom()
+                    visibleTiles.add(tile);
+                }
+            }
+
+            function removeTileFromDom(tile){
+                if(visibleTiles.has(tile)){
+                    tile.removeHTMLElementFromDom()
+                    visibleTiles.delete(tile);
+                }
+            }
+
+
+
             if(dx <= 0 && dy <= 0){
-                console.log("to top left")
                 //shift to top left
                 //update top
-                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
-                    for(let y = newTopmostTile; y <= oldTopmostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,oldTopmostTile ,addTileToDom)
                 //update left
-                for(let x = newLeftmostTile; x <= oldLeftmostTile; x++){
-                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove bottom
-                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
-                    for(let y = newBottommostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
-                
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile ,removeTileFromDom)
                 //remove right
-                for(let x = newRightmostTile; x <= oldRightmostTile - 1; x++){
-                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-                
-
-
-
+                UpdateTileBlock(newRightmostTile, oldRightmostTile, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
             }else if(dx <= 0 && dy >= 0){
-                console.log("to bottom left")
                 //shift to bottom left
                 //update bottom
-                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
-                    for(let y = oldBottommostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile ,newBottommostTile ,addTileToDom)
                 //update left
-                for(let x = newLeftmostTile; x <= oldLeftmostTile; x++){
-                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove top
-                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
-                    for(let y = oldTopmostTile; y <= newTopmostTile - 1; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile ,newTopmostTile -1 ,removeTileFromDom)
                 //remove right
-                for(let x = newRightmostTile; x <= oldRightmostTile; x++){
-                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
+                UpdateTileBlock(newRightmostTile, oldRightmostTile, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
+
 
             }else if(dx >= 0 && dy >= 0){
-                console.log("to bottom right")
                 //shift to bottom right
                 //update bottom
-                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
-                    for(let y = oldBottommostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile ,newBottommostTile ,addTileToDom)
                 //update right
-                for(let x = oldRightmostTile; x <= newRightmostTile; x++){
-                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove top
-                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
-                    for(let y = oldTopmostTile; y <= newTopmostTile - 1; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile ,newTopmostTile -1 ,removeTileFromDom)
                 //remove left
-                for(let x = oldLeftmostTile; x <= newLeftmostTile - 1; x++){
-                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
-
-
-
-
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile -1 ,removeTileFromDom)
             }else if(dx >= 0 && dy <= 0){
                 console.log("to top right")
                 //shift to top right
                 //update top
-                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
-                    for(let y = newTopmostTile; y <= oldTopmostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,oldTopmostTile ,addTileToDom)
                 //update right
-                for(let x = oldRightmostTile; x <= newRightmostTile; x++){
-                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(!visibleTiles.has(tile)){
-                            //Only add tiles when they aren't in the visible tiles set
-                            tile.appendHTMLElementToDom()
-                            visibleTiles.add(tile);
-                        }
-                    }
-                }
-
-                
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove left
-                for(let x = oldLeftmostTile; x <= newLeftmostTile - 1; x++){
-                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile,removeTileFromDom)
                 //remove bottom
-                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
-                    for(let y = newBottommostTile; y <= oldBottommostTile; y++){
-                        let tile = getTile(x, y)
-                        if(visibleTiles.has(tile)){
-                            tile.removeHTMLElementFromDom()
-                            visibleTiles.delete(tile);
-                        }
-                    }
-                }
-
-
-
-
-
-
-
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile,removeTileFromDom)
             }
-            
-            /** 
-            removeAllInvisilbeTilesfromDom();
-
-
-
-            let leftmostTile = Math.max(0, Math.floor(minX / tileWidth));
-            let rightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
-            let topmostTile =  Math.max(0, Math.floor(minY / tileHeight));
-            let bottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
-
-            for(let x = leftmostTile; x <= rightmostTile; x++){
-                for(let y = topmostTile; y <= bottommostTile; y++){
-                    let tile = getTile(x, y)
-                    if(!visibleTiles.has(tile)){
-                        //Only add tiles when they aren't in the visible tiles set
-                        tile.appendHTMLElementToDom()
-                        visibleTiles.add(tile);
-                    }
-                }
-            }
-            */
         }
         
     }
