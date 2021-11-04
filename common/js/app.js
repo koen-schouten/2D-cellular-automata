@@ -1,14 +1,13 @@
 import { svgGrid } from './Grid.js';
 
-const gridSize = 100;
+const gridSize = 500;
 
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");
     svgGrid.init(gridHolderElement, gridSize, gridSize);
     addDragListener(svgGrid);
     addZoomListeners(svgGrid);
-
-    svgGrid.updateViewBox(50, 50, gridSize/10, gridSize/10);
+    svgGrid.updateViewBox(50, 50, 10/gridSize, 10/gridSize);
 }
 
 
@@ -46,19 +45,20 @@ function addZoomListeners(svgGrid) {
         //zoom out
         if (event.deltaY > 0) {
             //zoom should happen around old center
-            let centerX = (svgViewBox.minX + svgViewBox.width)/2 ;
-            let centerY = (svgViewBox.minY + svgViewBox.height)/2;
-
+            let centerX = (svgViewBox.minX + svgViewBox.width/2);
+            let centerY = (svgViewBox.minY + svgViewBox.height/2);
             let newWidth = svgViewBox.width * zoomSpeed;
             let newHeight = svgViewBox.height * zoomSpeed;
 
             //Limit the zoom to 100%
             if(newWidth <= 100 && newHeight <= 100){
-                svgGrid.updateViewBox(centerX - newWidth / 2,
-                    centerY - newHeight / 2 ,
+                svgGrid.updateViewBox(centerX - (newWidth / 2),
+                    centerY - (newHeight / 2),
                     newWidth,
                     newHeight)
             }
+            console.log(svgGrid.getViewBox());
+
         }
     })
 }
