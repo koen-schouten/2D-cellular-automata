@@ -7,7 +7,7 @@ function init() {
     svgGrid.init(gridHolderElement, gridSize, gridSize);
     addDragListener(svgGrid);
     addZoomListeners(svgGrid);
-    svgGrid.updateViewBox(50, 50, 10/gridSize, 10/gridSize);
+    svgGrid.updateViewBox(50, 50, 5, 5);
 }
 
 
@@ -57,8 +57,6 @@ function addZoomListeners(svgGrid) {
                     newWidth,
                     newHeight)
             }
-            console.log(svgGrid.getViewBox());
-
         }
     })
 }
@@ -96,9 +94,7 @@ function addDragListener(svgGrid) {
             let cursorpt = pt.matrixTransform(svg.getScreenCTM().inverse());
             let newX = svgViewBox.minX - (cursorpt.x - startX);
             let newY = svgViewBox.minY - (cursorpt.y - startY);
-            console.time('Execution Time');
             svgGrid.updateViewBox(newX, newY, svgViewBox.width, svgViewBox.height);
-            console.timeEnd('Execution Time');
         }
     })
     svg.addEventListener("mouseup", event => { dragging = false })
