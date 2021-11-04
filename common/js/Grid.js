@@ -8,7 +8,7 @@ const svgGrid = (function () {
 
 
     const tiles = new Array();
-    const visibleTiles = new Array();
+    const visibleTiles = new Set();
 
     //A percentage based ViewBox for the svg is used.
     //The full grid has a viewbox of 100 by 100.
@@ -65,35 +65,318 @@ const svgGrid = (function () {
     }
 
     function removeAllInvisilbeTilesfromDom(){
-        visibleTiles.forEach(tile =>{
+        for (let tile of visibleTiles){
             if(!isTileVisible(tile.x, tile.y)){
                 tile.removeHTMLElementFromDom();
+                visibleTiles.delete(tile);
+
             }
-        })
+        }
+
     }
 
+    /**
+     * This function updates the tiles when we change the viewBox of the SVG.
+     * @param {*} oldViewBox 
+     */
     function updateTiles(oldViewBox) {
-        removeAllInvisilbeTilesfromDom();
-        let tileWidth = 100 / getWidth()
-        let tileHeight = 100 / getHeigth()
+        const zoomedIn = oldViewBox.width > viewBox.width && oldViewBox.height > viewBox.width
+        const zoomedOut = oldViewBox.width < viewBox.width && oldViewBox.height < viewBox.width
+        const zoomed = zoomedIn||zoomedOut;
 
-        let minX = viewBox.minX;
-        let maxX = viewBox.minY;
-        let minY = viewBox.minX + viewBox.width;
-        let maxY = viewBox.minY + viewBox.height;
+        const dx = viewBox.minX - oldViewBox.minX
+        const dy =  viewBox.minY - oldViewBox.minY
 
+        if(zoomedIn){
+            //When zooming in only old tiles have to be removed. No new tiles will be visible
+            removeAllInvisilbeTilesfromDom();
+        }else if(zoomedOut){
+            //When zooming out we only add new tiles. Only new tiles become visible. 
+            //We don't have to remove old tiles.
+            let tileWidth = 100 / getWidth()
+            let tileHeight = 100 / getHeigth()
 
-        let leftmostTile = Math.max(0, Math.floor(minX / tileWidth));
-        let rightmostTile = Math.min(width - 1, Math.ceil(minY / tileWidth));
-        let topmostTile =  Math.max(0, Math.floor(maxX / tileHeight));
-        let bottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+            let minX = viewBox.minX;
+            let maxX = viewBox.minX + viewBox.width; 
+            let minY = viewBox.minY;
+            let maxY = viewBox.minY + viewBox.height;
 
-        for(let x = leftmostTile; x <= rightmostTile; x++){
-            for(let y = topmostTile; y <= bottommostTile; y++){
-                let tile = getTile(x, y);
-                tile.appendHTMLElementToDom()
-                visibleTiles.push(tile);
+            let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
+            let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
+            let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
+            let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+
+            for(let x = newLeftmostTile; x <= newRightmostTile; x++){
+                for(let y = newTopmostTile; y <= newBottommostTile; y++){
+                    let tile = getTile(x, y)
+                    if(!visibleTiles.has(tile)){
+                        //Only add tiles when they aren't in the visible tiles set
+                        tile.appendHTMLElementToDom()
+                        visibleTiles.add(tile);
+                    }
+                }
             }
+
+        }else if(!zoomed){
+            //When we are not zooming. We are moving. In that case we need to check how far we moved
+            //and update the tile that gets shifted in and out of view.
+            let tileWidth = 100 / getWidth()
+            let tileHeight = 100 / getHeigth()
+
+            let minX = viewBox.minX;
+            let maxX = viewBox.minX + viewBox.width; 
+            let minY = viewBox.minY;
+            let maxY = viewBox.minY + viewBox.height;
+
+            let oldMaxY = oldViewBox.minY + oldViewBox.height;
+            let oldMaxX = oldViewBox.minX + oldViewBox.height;
+
+
+            let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
+            let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
+            let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
+            let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+
+            let oldLeftmostTile = Math.max(0, Math.floor(oldViewBox.minX / tileWidth));
+            let oldRightmostTile = Math.min(width - 1, Math.ceil(oldMaxX / tileWidth));
+            let oldTopmostTile =  Math.max(0, Math.floor(oldViewBox.minY / tileHeight));
+            let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
+
+
+            if(dx <= 0 && dy <= 0){
+                console.log("to top left")
+                //shift to top left
+                //update top
+                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
+                    for(let y = newTopmostTile; y <= oldTopmostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //update left
+                for(let x = newLeftmostTile; x <= oldLeftmostTile; x++){
+                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //remove bottom
+                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
+                    for(let y = newBottommostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+                
+                //remove right
+                for(let x = newRightmostTile; x <= oldRightmostTile - 1; x++){
+                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+                
+
+
+
+            }else if(dx <= 0 && dy >= 0){
+                console.log("to bottom left")
+                //shift to bottom left
+                //update bottom
+                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
+                    for(let y = oldBottommostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //update left
+                for(let x = newLeftmostTile; x <= oldLeftmostTile; x++){
+                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //remove top
+                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
+                    for(let y = oldTopmostTile; y <= newTopmostTile - 1; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+                //remove right
+                for(let x = newRightmostTile; x <= oldRightmostTile; x++){
+                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+            }else if(dx >= 0 && dy >= 0){
+                console.log("to bottom right")
+                //shift to bottom right
+                //update bottom
+                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
+                    for(let y = oldBottommostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //update right
+                for(let x = oldRightmostTile; x <= newRightmostTile; x++){
+                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //remove top
+                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
+                    for(let y = oldTopmostTile; y <= newTopmostTile - 1; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+                //remove left
+                for(let x = oldLeftmostTile; x <= newLeftmostTile - 1; x++){
+                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+
+
+
+
+            }else if(dx >= 0 && dy <= 0){
+                console.log("to top right")
+                //shift to top right
+                //update top
+                for(let x = newLeftmostTile; x <= newRightmostTile; x++){
+                    for(let y = newTopmostTile; y <= oldTopmostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                //update right
+                for(let x = oldRightmostTile; x <= newRightmostTile; x++){
+                    for(let y = newTopmostTile; y <= newBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(!visibleTiles.has(tile)){
+                            //Only add tiles when they aren't in the visible tiles set
+                            tile.appendHTMLElementToDom()
+                            visibleTiles.add(tile);
+                        }
+                    }
+                }
+
+                
+                //remove left
+                for(let x = oldLeftmostTile; x <= newLeftmostTile - 1; x++){
+                    for(let y = oldTopmostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+                //remove bottom
+                for(let x = oldLeftmostTile; x <= oldRightmostTile; x++){
+                    for(let y = newBottommostTile; y <= oldBottommostTile; y++){
+                        let tile = getTile(x, y)
+                        if(visibleTiles.has(tile)){
+                            tile.removeHTMLElementFromDom()
+                            visibleTiles.delete(tile);
+                        }
+                    }
+                }
+
+
+
+
+
+
+
+            }
+            
+            /** 
+            removeAllInvisilbeTilesfromDom();
+
+
+
+            let leftmostTile = Math.max(0, Math.floor(minX / tileWidth));
+            let rightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
+            let topmostTile =  Math.max(0, Math.floor(minY / tileHeight));
+            let bottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+
+            for(let x = leftmostTile; x <= rightmostTile; x++){
+                for(let y = topmostTile; y <= bottommostTile; y++){
+                    let tile = getTile(x, y)
+                    if(!visibleTiles.has(tile)){
+                        //Only add tiles when they aren't in the visible tiles set
+                        tile.appendHTMLElementToDom()
+                        visibleTiles.add(tile);
+                    }
+                }
+            }
+            */
         }
         
     }
@@ -142,9 +425,6 @@ const svgGrid = (function () {
     function getHeigth() {
         return height;
     }
-
-
-
 
     return {
         init: init,
