@@ -6,7 +6,9 @@ const svgGrid = (function () {
     let width;
     let height;
 
+
     const tiles = new Array();
+    const visibleTiles = new Array();
 
     //A percentage based ViewBox for the svg is used.
     //The full grid has a viewbox of 100 by 100.
@@ -24,13 +26,20 @@ const svgGrid = (function () {
     }
 
     function updateViewBox(minX, minY, width, height) {
+        let oldViewBox = {
+            minX: viewBox.minX,
+            minY: viewBox.minY,
+            width: viewBox.width,
+            height: viewBox.height
+        }
+
         viewBox.minX = minX;
         viewBox.minY = minY;
         viewBox.width = width;
         viewBox.height = height;
 
         svgElement.setAttribute("viewBox", viewBoxToString())
-        updateTiles();
+        updateTiles(oldViewBox);
     }
 
     function getViewBox() {
@@ -55,14 +64,38 @@ const svgGrid = (function () {
         return svgElement;
     }
 
-    function updateTiles() {
-        tiles.forEach(tile => {
-            if (isTileVisible(tile.x, tile.y)) {
-                tile.appendHTMLElementToDom()
-            } else {
-                tile.removeHTMLElementFromDom()
+    function removeAllInvisilbeTilesfromDom(){
+        visibleTiles.forEach(tile =>{
+            if(!isTileVisible(tile.x, tile.y)){
+                tile.removeHTMLElementFromDom();
             }
         })
+    }
+
+    function updateTiles(oldViewBox) {
+        removeAllInvisilbeTilesfromDom();
+        let tileWidth = 100 / getWidth()
+        let tileHeight = 100 / getHeigth()
+
+        let minX = viewBox.minX;
+        let maxX = viewBox.minY;
+        let minY = viewBox.minX + viewBox.width;
+        let maxY = viewBox.minY + viewBox.height;
+
+
+        let leftmostTile = Math.max(0, Math.floor(minX / tileWidth));
+        let rightmostTile = Math.min(width - 1, Math.ceil(minY / tileWidth));
+        let topmostTile =  Math.max(0, Math.floor(maxX / tileHeight));
+        let bottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+
+        for(let x = leftmostTile; x <= rightmostTile; x++){
+            for(let y = topmostTile; y <= bottommostTile; y++){
+                let tile = getTile(x, y);
+                tile.appendHTMLElementToDom()
+                visibleTiles.push(tile);
+            }
+        }
+        
     }
 
     function isTileVisible(x, y) {
@@ -99,7 +132,7 @@ const svgGrid = (function () {
     }
 
     function getTile(x, y) {
-        return tiles[x + y * width]
+        return tiles[y + x * width]
     }
 
     function getWidth() {
