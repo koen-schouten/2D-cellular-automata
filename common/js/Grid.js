@@ -87,6 +87,30 @@ const svgGrid = (function () {
         const dx = viewBox.minX - oldViewBox.minX
         const dy =  viewBox.minY - oldViewBox.minY
 
+        function UpdateTileBlock(minX, maxX, minY, maxY, func){
+            for(let x = minX; x <= maxX; x++){
+                for(let y = minY; y <= maxY; y++){
+                    let tile = getTile(x, y)
+                    func(tile)
+                }
+            }
+        }
+
+        function addTileToDom(tile){
+            if(!visibleTiles.has(tile)){
+                //Only add tiles when they aren't in the visible tiles set
+                tile.appendHTMLElementToDom()
+                visibleTiles.add(tile);
+            }
+        }
+
+        function removeTileFromDom(tile){
+            if(visibleTiles.has(tile)){
+                tile.removeHTMLElementFromDom()
+                visibleTiles.delete(tile);
+            }
+        }
+
         if(zoomedIn){
             //When zooming in only old tiles have to be removed. No new tiles will be visible
             removeAllInvisilbeTilesfromDom();
@@ -101,21 +125,14 @@ const svgGrid = (function () {
             let minY = viewBox.minY;
             let maxY = viewBox.minY + viewBox.height;
 
+
+
             let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
             let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
             let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
             let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
 
-            for(let x = newLeftmostTile; x <= newRightmostTile; x++){
-                for(let y = newTopmostTile; y <= newBottommostTile; y++){
-                    let tile = getTile(x, y)
-                    if(!visibleTiles.has(tile)){
-                        //Only add tiles when they aren't in the visible tiles set
-                        tile.appendHTMLElementToDom()
-                        visibleTiles.add(tile);
-                    }
-                }
-            }
+            UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
 
         }else if(!zoomed){
             //When we are not zooming. We are moving. In that case we need to check how far we moved
@@ -131,7 +148,6 @@ const svgGrid = (function () {
             let oldMaxY = oldViewBox.minY + oldViewBox.height;
             let oldMaxX = oldViewBox.minX + oldViewBox.height;
 
-
             let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
             let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
             let newTopmostTile =  Math.max(0, Math.floor(minY / tileHeight));
@@ -143,32 +159,6 @@ const svgGrid = (function () {
             let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
 
 
-            function UpdateTileBlock(minX, maxX, minY, maxY, func){
-                for(let x = minX; x <= maxX; x++){
-                    for(let y = minY; y <= maxY; y++){
-                        let tile = getTile(x, y)
-                        func(tile)
-                    }
-                }
-            }
-
-            function addTileToDom(tile){
-                if(!visibleTiles.has(tile)){
-                    //Only add tiles when they aren't in the visible tiles set
-                    tile.appendHTMLElementToDom()
-                    visibleTiles.add(tile);
-                }
-            }
-
-            function removeTileFromDom(tile){
-                if(visibleTiles.has(tile)){
-                    tile.removeHTMLElementFromDom()
-                    visibleTiles.delete(tile);
-                }
-            }
-
-
-
             if(dx <= 0 && dy <= 0){
                 //shift to top left
                 //update top
@@ -176,9 +166,9 @@ const svgGrid = (function () {
                 //update left
                 UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile ,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile - 1 ,removeTileFromDom)
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
             }else if(dx <= 0 && dy >= 0){
                 //shift to bottom left
                 //update bottom
@@ -186,11 +176,9 @@ const svgGrid = (function () {
                 //update left
                 UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile ,newTopmostTile -1 ,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile -1,newTopmostTile - 1,removeTileFromDom)
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
-
-
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile ,oldBottommostTile ,removeTileFromDom)
             }else if(dx >= 0 && dy >= 0){
                 //shift to bottom right
                 //update bottom
@@ -198,11 +186,10 @@ const svgGrid = (function () {
                 //update right
                 UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile ,newBottommostTile ,addTileToDom)
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile ,newTopmostTile -1 ,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1,newTopmostTile -1 ,removeTileFromDom)
                 //remove left
                 UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile -1 ,removeTileFromDom)
             }else if(dx >= 0 && dy <= 0){
-                console.log("to top right")
                 //shift to top right
                 //update top
                 UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile ,oldTopmostTile ,addTileToDom)
@@ -211,7 +198,7 @@ const svgGrid = (function () {
                 //remove left
                 UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile ,oldBottommostTile,removeTileFromDom)
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile,removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile ,oldBottommostTile - 1,removeTileFromDom)
             }
         }
         
