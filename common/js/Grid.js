@@ -64,17 +64,6 @@ const svgGrid = (function () {
         return svgElement;
     }
 
-    function removeAllInvisilbeTilesfromDom() {
-        for (let tile of visibleTiles) {
-            if (!isTileVisible(tile.x, tile.y)) {
-                tile.removeHTMLElementFromDom();
-                visibleTiles.delete(tile);
-
-            }
-        }
-
-    }
-
     /**
      * This function updates the tiles when we change the viewBox of the SVG.
      * @param {*} oldViewBox 
@@ -118,18 +107,13 @@ const svgGrid = (function () {
         }
 
         function addTileToDom(tile) {
-            if (!visibleTiles.has(tile)) {
                 //Only add tiles when they aren't in the visible tiles set
-                tile.appendHTMLElementToDom()
-                visibleTiles.add(tile);
-            }
+                tile.appendHTMLElementToDom();
         }
 
         function removeTileFromDom(tile) {
-            if (visibleTiles.has(tile)) {
-                tile.removeHTMLElementFromDom()
+                tile.removeHTMLElementFromDom();
                 visibleTiles.delete(tile);
-            }
         }
 
         if (zoomedIn) {
@@ -168,7 +152,7 @@ const svgGrid = (function () {
                 //update left
                 UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom);
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile, newTopmostTile - 1, removeTileFromDom);
                 //remove right
                 UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom);
             } else if (dx >= 0 && dy >= 0) {
@@ -178,7 +162,7 @@ const svgGrid = (function () {
                 //update right
                 UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom);
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile, newTopmostTile - 1, removeTileFromDom);
                 //remove left
                 UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile - 1, removeTileFromDom);
             } else if (dx >= 0 && dy <= 0) {
@@ -192,29 +176,6 @@ const svgGrid = (function () {
                 //remove bottom
                 UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom);
             }
-        }
-
-    }
-
-    function isTileVisible(x, y) {
-        let left = viewBox.minX;
-        let top = viewBox.minY;
-        let right = viewBox.minX + viewBox.width;
-        let bottom = viewBox.minY + viewBox.height;
-
-        let tileWidth = 100 / getWidth()
-        let tileHeight = 100 / getHeigth()
-        let tileXpos = x * tileWidth;
-        let tileYpos = y * tileHeight;
-
-        if (tileXpos + 2 * tileWidth > left &&
-            tileXpos < right &&
-            tileYpos + 2 * tileHeight > top &&
-            tileYpos < bottom) {
-            return true;
-        }
-        else {
-            return false;
         }
 
     }
