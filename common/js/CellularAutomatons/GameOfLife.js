@@ -30,9 +30,11 @@ export class GameOfLife extends BaseCellularAutomaton{
     }
     
     updateState(newState){
-        this.state = newState;
-        //update observers
-        this.fire();
+        if(newState != this.state){
+            this.state = newState;
+            //update observers
+            this.fire();
+        }
     }
 
     getNextState(){
