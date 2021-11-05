@@ -2,7 +2,7 @@ import { svgGrid } from './views/SVGGrid.js';
 import { automatonGrid } from './CellularAutomatons/AutomatonGrid.js';
 import { GameOfLife } from './CellularAutomatons/GameOfLife.js';
 
-const gridSize = 200;
+const gridSize = 500;
 
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");
