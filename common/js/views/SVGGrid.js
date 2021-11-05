@@ -120,7 +120,11 @@ const svgGrid = (function () {
             for (let x = minX; x <= maxX; x++) {
                 for (let y = minY; y <= maxY; y++) {
                     let tile = getTile(x, y)
-                    func(tile)
+                    //Check if tile exists
+                    //When scrolling too far, there will be no tile
+                    if(tile){
+                        func(tile)
+                    }
                 }
             }
         }
