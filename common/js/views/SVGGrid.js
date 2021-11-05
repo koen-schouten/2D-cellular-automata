@@ -143,6 +143,13 @@ const svgGrid = (function () {
             UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile, oldBottommostTile, removeTileFromDom);
             UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
         } else if (zoomedOut) {
+
+            //If the old viewbox width and height equals zero, 
+            // we didn't actualy zoom out. We can just add the tiles in zoombox to DOM. 
+            if(oldViewBox.width == 0 && oldViewBox.height == 0){
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
+                return;
+            } else{
             //When zooming out we only add new tiles. Only new tiles become visible. 
             //We don't have to remove old tiles.
 
@@ -155,6 +162,7 @@ const svgGrid = (function () {
             UpdateTileBlock(oldLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom);
             //LEFT
             UpdateTileBlock(newLeftmostTile, oldLeftmostTile, oldTopmostTile, newBottommostTile, addTileToDom);
+            }
         } else if (!zoomed) {
             //When we are not zooming. We are moving. In that case we need to check how far we moved
             //and update the tile that gets shifted in and out of view.
