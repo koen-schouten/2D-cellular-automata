@@ -2,7 +2,7 @@ import { svgGrid } from './views/SVGGrid.js';
 import { automatonGrid } from './CellularAutomatons/AutomatonGrid.js';
 import { GameOfLife } from './CellularAutomatons/GameOfLife.js';
 
-const gridSize = 100;
+const gridSize = 200;
 
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");
@@ -12,12 +12,13 @@ function init() {
     svgGrid.init(gridHolderElement, gridSize, gridSize, GameOfLife.TILE_STYLES);
 
     attachAutomatonObservers(automatonGrid, svgGrid);
-    svgGrid.updateViewBox(50, 50, 5, 5);
-
-    runGame(automatonGrid);
+    svgGrid.setViewBox(50, 50, 5, 5);
 
 
-
+    document.getElementById("updateButton").addEventListener("click", (e) =>{
+        automatonGrid.updateGrid();
+    })
+    runGame(automatonGrid)
 }
 
 function runGame(automatonGrid){
@@ -25,16 +26,15 @@ function runGame(automatonGrid){
         automatonGrid.updateGrid();
         runGame(automatonGrid)
     },
-    1000);
+    0);
 }
-
 
 function attachAutomatonObservers(automatonGrid, svgGrid){
     let automatonTiles = automatonGrid.getTiles();
     automatonTiles.forEach(automatonTile => {
         let x = automatonTile.x;
         let y = automatonTile.y;
-        let automaton = automatonTile.content;
+        let automaton = automatonTile.getContent();
 
         let svgTile = svgGrid.getTile(x, y);
         automaton.subscribe(automaton => {svgTile.updateHTMLElement(automaton.state) } );

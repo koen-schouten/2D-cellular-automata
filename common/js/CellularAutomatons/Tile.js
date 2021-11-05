@@ -1,19 +1,19 @@
 export class Tile{
-    content;
+    _content;
 
     constructor(x, y, grid){
-        this.content = content;
+        this._content = content;
         this.x = x;
         this.y = y;
         this.grid = grid;
     }
     
     setContent(content){
-        this.content = content;
+        this._content = content;
     }
 
     getContent(){
-        return this.content;
+        return this._content;
     }
 
     getNorthTile(){

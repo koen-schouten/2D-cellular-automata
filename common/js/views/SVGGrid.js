@@ -10,7 +10,7 @@ const svgGrid = (function () {
 
 
     const tiles = new Array();
-    const visibleTiles = new Set();
+    const MAX_TILES_VISIBLE = 5000;
 
     //A percentage based ViewBox for the svg is used.
     //The full grid has a viewbox of 100 by 100.
@@ -30,7 +30,7 @@ const svgGrid = (function () {
         return `${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
     }
 
-    function updateViewBox(minX, minY, width, height) {
+    function setViewBox(minX, minY, width, height) {
         let oldViewBox = {
             minX: viewBox.minX,
             minY: viewBox.minY,
@@ -76,7 +76,15 @@ const svgGrid = (function () {
     function initSVGElement() {
         svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svgElement.setAttribute("viewBox", viewBoxToString())
+        addSVGElementToDom();
+    }
+
+    function addSVGElementToDom(){
         gridHolderElement.appendChild(svgElement)
+    }
+
+    function removeSVGElementFronDom(){
+        svgElement.remove();
     }
 
     function getSVGElement() {
@@ -88,6 +96,7 @@ const svgGrid = (function () {
      * @param {*} oldViewBox 
      */
     function updateTiles(oldViewBox) {
+
         const zoomedIn = oldViewBox.width > viewBox.width && oldViewBox.height > viewBox.width
         const zoomedOut = oldViewBox.width < viewBox.width && oldViewBox.height < viewBox.width
         const zoomed = zoomedIn || zoomedOut;
@@ -130,17 +139,16 @@ const svgGrid = (function () {
         }
 
         function addTileToDom(tile) {
-                //Only add tiles when they aren't in the visible tiles set
-                tile.appendHTMLElementToDom();
+            //Only add tiles when they aren't in the visible tiles set
+            tile.appendHTMLElementToDom();
         }
 
         function removeTileFromDom(tile) {
                 tile.removeHTMLElementFromDom();
-                visibleTiles.delete(tile);
         }
 
         if (zoomedIn) {
-            UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile, oldBottommostTile, removeTileFromDom);
+            UpdateTileBlock(oldLeftmostTile - 1, oldRightmostTile + 1, oldTopmostTile - 1, oldBottommostTile + 1, removeTileFromDom);
             UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
         } else if (zoomedOut) {
 
@@ -233,6 +241,13 @@ const svgGrid = (function () {
         return height;
     }
 
+    function tilesVisible(){
+        let tileWidth = 100 / getWidth();
+        let tileHeight = 100 / getHeigth();
+
+        return viewBox.width/ tileWidth * viewBox.height/ tileHeight
+    }
+
     /**
  * Function that adds eventlisters for zooming when scrolling the mouse.
  */
@@ -258,22 +273,22 @@ const svgGrid = (function () {
                 let newWidth = svgViewBox.width / zoomSpeed;
                 let newHeight = svgViewBox.height / zoomSpeed;
 
-                svgGrid.updateViewBox(centerX - newWidth / 2,
+                svgGrid.setViewBox(centerX - newWidth / 2,
                     centerY - newHeight / 2,
                     newWidth,
                     newHeight)
             }
             //zoom out
             if (event.deltaY > 0) {
-                //zoom should happen around old center
                 let centerX = (svgViewBox.minX + svgViewBox.width/2);
                 let centerY = (svgViewBox.minY + svgViewBox.height/2);
                 let newWidth = svgViewBox.width * zoomSpeed;
                 let newHeight = svgViewBox.height * zoomSpeed;
 
-                //Limit the zoom to 100%
-                if(newWidth <= 100 && newHeight <= 100){
-                    svgGrid.updateViewBox(centerX - (newWidth / 2),
+                //Limit the zoom so that you can zoom out when more than
+                // MAX_TILES_VISIBLE tiles are visible
+                if(!(tilesVisible() > MAX_TILES_VISIBLE)){
+                    svgGrid.setViewBox(centerX - (newWidth / 2),
                         centerY - (newHeight / 2),
                         newWidth,
                         newHeight)
@@ -291,6 +306,8 @@ const svgGrid = (function () {
         let dragging = false;
         let startX = 0;
         let startY = 0;
+        
+        let wait = false;
 
         svgElement.addEventListener("mousedown", event => {
             dragging = true
@@ -311,7 +328,7 @@ const svgGrid = (function () {
                 let cursorpt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
                 let newX = svgViewBox.minX - (cursorpt.x - startX);
                 let newY = svgViewBox.minY - (cursorpt.y - startY);
-                svgGrid.updateViewBox(newX, newY, svgViewBox.width, svgViewBox.height);
+                svgGrid.setViewBox(newX, newY, svgViewBox.width, svgViewBox.height);
             }
         })
         svgElement.addEventListener("mouseup", event => { dragging = false })
@@ -325,7 +342,7 @@ const svgGrid = (function () {
         getWidth: getWidth,
         getHeigth: getHeigth,
         getSVGElement: getSVGElement,
-        updateViewBox: updateViewBox,
+        setViewBox: setViewBox,
         getViewBox: getViewBox
     }
 })();
