@@ -58,6 +58,8 @@ const svgGrid = (function () {
         initSVGElement();
         addtileType();
         initTiles();
+        addZoomListeners();
+        addDragListener();
     }
 
 
@@ -212,6 +214,92 @@ const svgGrid = (function () {
 
     function getHeigth() {
         return height;
+    }
+
+    /**
+ * Function that adds eventlisters for zooming when scrolling the mouse.
+ */
+    function addZoomListeners() {
+        let pt = svgElement.createSVGPoint()
+        let svgViewBox = svgGrid.getViewBox();
+
+        svgElement.addEventListener("wheel", event => {
+            event.preventDefault();
+            let zoomSpeed = 1.25;
+            pt.x = event.clientX;
+            pt.y = event.clientY;
+
+            //cursorpt is mouse position in viewbox
+            let cursorpt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
+
+            //zoom in 
+            if (event.deltaY < 0) {
+                //zoom should happen around mouse position in viewbox.
+                let centerX = cursorpt.x;
+                let centerY = cursorpt.y;
+
+                let newWidth = svgViewBox.width / zoomSpeed;
+                let newHeight = svgViewBox.height / zoomSpeed;
+
+                svgGrid.updateViewBox(centerX - newWidth / 2,
+                    centerY - newHeight / 2,
+                    newWidth,
+                    newHeight)
+            }
+            //zoom out
+            if (event.deltaY > 0) {
+                //zoom should happen around old center
+                let centerX = (svgViewBox.minX + svgViewBox.width/2);
+                let centerY = (svgViewBox.minY + svgViewBox.height/2);
+                let newWidth = svgViewBox.width * zoomSpeed;
+                let newHeight = svgViewBox.height * zoomSpeed;
+
+                //Limit the zoom to 100%
+                if(newWidth <= 100 && newHeight <= 100){
+                    svgGrid.updateViewBox(centerX - (newWidth / 2),
+                        centerY - (newHeight / 2),
+                        newWidth,
+                        newHeight)
+                }
+            }
+        })
+    }
+
+    //Code for dragging the image.
+    //TODO: make it work for touchscreens
+    function addDragListener() {
+        let pt = svgElement.createSVGPoint()
+        let svgViewBox = svgGrid.getViewBox();
+
+        let dragging = false;
+        let startX = 0;
+        let startY = 0;
+
+        svgElement.addEventListener("mousedown", event => {
+            dragging = true
+            pt.x = event.clientX;
+            pt.y = event.clientY;
+            //cursorpt is mouse position in viewbox
+            let cursorpt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
+            startX = cursorpt.x;
+            startY = cursorpt.y;
+        })
+
+
+        svgElement.addEventListener("mousemove", event => {
+            if (dragging) {
+                pt.x = event.clientX;
+                pt.y = event.clientY
+                //cursorpt is mouse position in viewbox
+                let cursorpt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
+                let newX = svgViewBox.minX - (cursorpt.x - startX);
+                let newY = svgViewBox.minY - (cursorpt.y - startY);
+                svgGrid.updateViewBox(newX, newY, svgViewBox.width, svgViewBox.height);
+            }
+        })
+        svgElement.addEventListener("mouseup", event => { dragging = false })
+
+        svgElement.addEventListener("mouseleave", event => { dragging = false })
     }
 
     return {
