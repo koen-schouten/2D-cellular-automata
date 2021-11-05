@@ -87,6 +87,27 @@ const svgGrid = (function () {
         const dx = viewBox.minX - oldViewBox.minX
         const dy = viewBox.minY - oldViewBox.minY
 
+        let tileWidth = 100 / getWidth()
+        let tileHeight = 100 / getHeigth()
+
+        let minX = viewBox.minX;
+        let maxX = viewBox.minX + viewBox.width;
+        let minY = viewBox.minY;
+        let maxY = viewBox.minY + viewBox.height;
+
+        let oldMaxY = oldViewBox.minY + oldViewBox.height;
+        let oldMaxX = oldViewBox.minX + oldViewBox.height;
+
+        let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
+        let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
+        let newTopmostTile = Math.max(0, Math.floor(minY / tileHeight));
+        let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
+
+        let oldLeftmostTile = Math.max(0, Math.floor(oldViewBox.minX / tileWidth));
+        let oldRightmostTile = Math.min(width - 1, Math.ceil(oldMaxX / tileWidth));
+        let oldTopmostTile = Math.max(0, Math.floor(oldViewBox.minY / tileHeight));
+        let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
+
         function UpdateTileBlock(minX, maxX, minY, maxY, func) {
             for (let x = minX; x <= maxX; x++) {
                 for (let y = minY; y <= maxY; y++) {
@@ -117,48 +138,19 @@ const svgGrid = (function () {
         } else if (zoomedOut) {
             //When zooming out we only add new tiles. Only new tiles become visible. 
             //We don't have to remove old tiles.
-            let tileWidth = 100 / getWidth()
-            let tileHeight = 100 / getHeigth()
 
-            let minX = viewBox.minX;
-            let maxX = viewBox.minX + viewBox.width;
-            let minY = viewBox.minY;
-            let maxY = viewBox.minY + viewBox.height;
-
-
-
-            let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
-            let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
-            let newTopmostTile = Math.max(0, Math.floor(minY / tileHeight));
-            let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
-
-            UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
-
+            //When zooming out, we only need to update the 4 sides. The center tiles don't need to be updated.
+            //TOP
+            UpdateTileBlock(newLeftmostTile, oldRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
+            //RIGHT
+            UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, oldBottommostTile, addTileToDom)
+            //BOTTOM
+            UpdateTileBlock(oldLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
+            //LEFT
+            UpdateTileBlock(newLeftmostTile, oldLeftmostTile, oldTopmostTile, newBottommostTile, addTileToDom)
         } else if (!zoomed) {
             //When we are not zooming. We are moving. In that case we need to check how far we moved
             //and update the tile that gets shifted in and out of view.
-            let tileWidth = 100 / getWidth()
-            let tileHeight = 100 / getHeigth()
-
-            let minX = viewBox.minX;
-            let maxX = viewBox.minX + viewBox.width;
-            let minY = viewBox.minY;
-            let maxY = viewBox.minY + viewBox.height;
-
-            let oldMaxY = oldViewBox.minY + oldViewBox.height;
-            let oldMaxX = oldViewBox.minX + oldViewBox.height;
-
-            let newLeftmostTile = Math.max(0, Math.floor(minX / tileWidth));
-            let newRightmostTile = Math.min(width - 1, Math.ceil(maxX / tileWidth));
-            let newTopmostTile = Math.max(0, Math.floor(minY / tileHeight));
-            let newBottommostTile = Math.min(height - 1, Math.ceil(maxY / tileHeight));
-
-            let oldLeftmostTile = Math.max(0, Math.floor(oldViewBox.minX / tileWidth));
-            let oldRightmostTile = Math.min(width - 1, Math.ceil(oldMaxX / tileWidth));
-            let oldTopmostTile = Math.max(0, Math.floor(oldViewBox.minY / tileHeight));
-            let oldBottommostTile = Math.min(height - 1, Math.ceil(oldMaxY / tileHeight));
-
-
             if (dx <= 0 && dy <= 0) {
                 //shift to top left
                 //update top
