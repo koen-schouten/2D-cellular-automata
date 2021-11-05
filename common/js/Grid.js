@@ -133,64 +133,64 @@ const svgGrid = (function () {
         }
 
         if (zoomedIn) {
-            //When zooming in only old tiles have to be removed. No new tiles will be visible
-            removeAllInvisilbeTilesfromDom();
+            UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile, oldBottommostTile, removeTileFromDom);
+            UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
         } else if (zoomedOut) {
             //When zooming out we only add new tiles. Only new tiles become visible. 
             //We don't have to remove old tiles.
 
             //When zooming out, we only need to update the 4 sides. The center tiles don't need to be updated.
             //TOP
-            UpdateTileBlock(newLeftmostTile, oldRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
+            UpdateTileBlock(newLeftmostTile, oldRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom);
             //RIGHT
-            UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, oldBottommostTile, addTileToDom)
+            UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, oldBottommostTile, addTileToDom);
             //BOTTOM
-            UpdateTileBlock(oldLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
+            UpdateTileBlock(oldLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom);
             //LEFT
-            UpdateTileBlock(newLeftmostTile, oldLeftmostTile, oldTopmostTile, newBottommostTile, addTileToDom)
+            UpdateTileBlock(newLeftmostTile, oldLeftmostTile, oldTopmostTile, newBottommostTile, addTileToDom);
         } else if (!zoomed) {
             //When we are not zooming. We are moving. In that case we need to check how far we moved
             //and update the tile that gets shifted in and out of view.
             if (dx <= 0 && dy <= 0) {
                 //shift to top left
                 //update top
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom);
                 //update left
-                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom);
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom);
             } else if (dx <= 0 && dy >= 0) {
                 //shift to bottom left
                 //update bottom
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom);
                 //update left
-                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, oldLeftmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom);
                 //remove right
-                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
+                UpdateTileBlock(newRightmostTile, oldRightmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom);
             } else if (dx >= 0 && dy >= 0) {
                 //shift to bottom right
                 //update bottom
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, oldBottommostTile, newBottommostTile, addTileToDom);
                 //update right
-                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove top
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, oldTopmostTile - 1, newTopmostTile - 1, removeTileFromDom);
                 //remove left
-                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile - 1, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile - 1, removeTileFromDom);
             } else if (dx >= 0 && dy <= 0) {
                 //shift to top right
                 //update top
-                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom)
+                UpdateTileBlock(newLeftmostTile, newRightmostTile, newTopmostTile, oldTopmostTile, addTileToDom);
                 //update right
-                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom)
+                UpdateTileBlock(oldRightmostTile, newRightmostTile, newTopmostTile, newBottommostTile, addTileToDom);
                 //remove left
-                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, newLeftmostTile - 1, oldTopmostTile, oldBottommostTile, removeTileFromDom);
                 //remove bottom
-                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom)
+                UpdateTileBlock(oldLeftmostTile, oldRightmostTile, newBottommostTile, oldBottommostTile - 1, removeTileFromDom);
             }
         }
 
