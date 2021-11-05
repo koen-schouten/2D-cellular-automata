@@ -22,9 +22,9 @@ export class Tile{
         this.rectElement.setAttribute("y", this.getY())
         this.rectElement.setAttribute("width", this.getWidth())
         this.rectElement.setAttribute("height", this.getHeigth())
-        this.rectElement.setAttribute("stroke", this.strokeColor)
-        this.rectElement.setAttribute("stroke-width", this.strokeWidth)
-        this.rectElement.setAttribute("fill", this.fillColor)
+        //this.rectElement.setAttribute("stroke", this.strokeColor)
+        //this.rectElement.setAttribute("stroke-width", this.strokeWidth)
+        this.rectElement.setAttribute("fill", '#'+Math.round(0xffffff * Math.random()).toString(16));
     }
 
     appendHTMLElementToDom(){
