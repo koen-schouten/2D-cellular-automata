@@ -51,21 +51,26 @@ const svgGrid = (function () {
         return viewBox;
     }
 
-    function init(element, horizontalTileCount, verticalTileCount) {
+    function init(element, horizontalTileCount, verticalTileCount, tileStyles) {
         gridHolderElement = element;
         width = horizontalTileCount;
         height = verticalTileCount;
         initSVGElement();
-        addtileType();
+        addtileType(tileStyles);
         initTiles();
         addZoomListeners();
         addDragListener();
     }
 
 
-    function addtileType(){
-        const tileType = new TileType(svgGrid, tileTypeID);
-        tileTypes.push(tileType);
+    function addtileType(tileStyles){
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svgElement.appendChild(defs);
+
+        for (const [id, style] of Object.entries(tileStyles)) {
+            const tileType = new TileType(svgGrid, id, style);
+            tileTypes.push(tileType);
+        }
     }
 
     function initSVGElement() {
@@ -304,6 +309,7 @@ const svgGrid = (function () {
 
     return {
         init: init,
+        getTile: getTile,
         getWidth: getWidth,
         getHeigth: getHeigth,
         getSVGElement: getSVGElement,

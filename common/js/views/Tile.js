@@ -21,10 +21,9 @@ export class Tile{
         svgElement.appendChild(this.useElement);
     }
 
-
     updateHTMLElement(tileType){
         this.tileType = tileType;
-        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + tileType.id);
+        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + tileType);
     }
 
     removeHTMLElementFromDom(){

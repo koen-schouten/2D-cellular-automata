@@ -1,15 +1,15 @@
 export class TileType{
-    constructor(grid, id, strokeWidth="0.05", strokeColor="#000", fillColor="#fff"){
+    constructor(grid, id, style){
         this.id = id;
-        this.strokeWidth = strokeWidth
-        this.strokeColor = strokeColor
-        this.fillColor = fillColor
+        this.strokeWidth = style.strokeWidth
+        this.strokeColor = style.strokeColor
+        this.fillColor = style.fillColor
         this.grid = grid;
         this.createHTMLElement();
     }
 
     createHTMLElement(){
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const defs = this.grid.getSVGElement().getElementsByTagName('defs')[0];
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         const rectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
@@ -25,7 +25,6 @@ export class TileType{
 
         g.appendChild(rectElement);
         defs.appendChild(g);
-        this.grid.getSVGElement().appendChild(defs);
     }
 
     getWidth(){
