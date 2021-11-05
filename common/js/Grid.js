@@ -1,4 +1,6 @@
 import { Tile } from "./Tile.js"
+import { TileType } from "./TileType.js"
+
 
 const svgGrid = (function () {
     let svgElement;
@@ -20,6 +22,9 @@ const svgGrid = (function () {
         width: 0,
         height: 0
     }
+
+    const tileTypes = new Array();
+    const tileTypeID = "tile"
 
     function viewBoxToString() {
         return `${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
@@ -51,7 +56,14 @@ const svgGrid = (function () {
         width = horizontalTileCount;
         height = verticalTileCount;
         initSVGElement();
+        addtileType();
         initTiles();
+    }
+
+
+    function addtileType(){
+        const tileType = new TileType(svgGrid, tileTypeID);
+        tileTypes.push(tileType);
     }
 
     function initSVGElement() {
@@ -184,7 +196,7 @@ const svgGrid = (function () {
         let tile;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                tile = new Tile(x, y, svgGrid)
+                tile = new Tile(x, y, svgGrid, tileTypes[0])
                 tiles.push(tile);
             }
         }

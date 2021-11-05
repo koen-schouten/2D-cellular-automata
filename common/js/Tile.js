@@ -1,60 +1,32 @@
 export class Tile{
-    rectElement;
+    useElement;
 
-
-    constructor(x, y, grid, strokeWidth="0.01", strokeColor="#000", fillColor="#fff"){
+    constructor(x, y, grid, tileType){
         this.x = x;
         this.y = y;
-        this.strokeWidth = strokeWidth
-        this.strokeColor = strokeColor
-        this.fillColor = fillColor
+        this.tileType = tileType;
         this.grid = grid;
         this.createHTMLElement();
     }
 
     createHTMLElement(){
-        this.rectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-
-        this.rectElement.setAttribute("data-gridX", this.x)
-        this.rectElement.setAttribute("data-gridY", this.y)
-
-        this.rectElement.setAttribute("x", this.getX())
-        this.rectElement.setAttribute("y", this.getY())
-        this.rectElement.setAttribute("width", this.getWidth())
-        this.rectElement.setAttribute("height", this.getHeigth())
-        //this.rectElement.setAttribute("stroke", this.strokeColor)
-        //this.rectElement.setAttribute("stroke-width", this.strokeWidth)
-        this.rectElement.setAttribute("fill", '#'+Math.round(0xffffff * Math.random()).toString(16));
+        this.useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + this.grid.patternID);
+        this.useElement.setAttribute("x", this.getX())
+        this.useElement.setAttribute("y", this.getY())
     }
 
     appendHTMLElementToDom(){
         let svgElement = this.grid.getSVGElement();
-        svgElement.appendChild(this.rectElement);
+        svgElement.appendChild(this.useElement);
     }
 
-    updateHTMLElement(){
-        this.rectElement.setAttribute("stroke", this.strokeColor)
-        this.rectElement.setAttribute("stroke-width", this.strokeWidth)
-        this.rectElement.setAttribute("fill", this.fillColor)
+    updateHTMLElement(tileType){
+        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + tileType.ID);
     }
 
     removeHTMLElementFromDom(){
-        this.rectElement.remove();
-    }
-
-    setFillColor(color){
-        this.fillColor = color;
-        this.updateHTMLElement();
-    }
-
-    setStrokeColor(color){
-        this.strokeColor = color;
-        this.updateHTMLElement();
-    }
-
-    setStrokeWidth(width){
-        this.setStrokeWidth = width;
-        this.updateHTMLElement();
+        this.useElement.remove();
     }
 
     getX(){
@@ -64,13 +36,4 @@ export class Tile{
     getY(){
         return this.y * (100 / this.grid.getHeigth());
     }
-
-    getWidth(){
-        return 100 / this.grid.getWidth();
-    }
-
-    getHeigth(){
-        return 100 / this.grid.getHeigth();
-    }
-
 }
