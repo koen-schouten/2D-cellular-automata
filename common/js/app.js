@@ -1,6 +1,6 @@
-import { svgGrid } from './Grid.js';
+import { svgGrid } from './views/Grid.js';
 
-const gridSize = 500;
+const gridSize = 250;
 
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");
