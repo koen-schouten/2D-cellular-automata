@@ -1,6 +1,6 @@
 export class TileType{
     constructor(grid, id, strokeWidth="0.01", strokeColor="#000", fillColor="#fff"){
-        this.ID = id;
+        this.id = id;
         this.strokeWidth = strokeWidth
         this.strokeColor = strokeColor
         this.fillColor = fillColor

@@ -11,7 +11,7 @@ export class Tile{
 
     createHTMLElement(){
         this.useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + this.grid.patternID);
+        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + this.tileType.id);
         this.useElement.setAttribute("x", this.getX())
         this.useElement.setAttribute("y", this.getY())
     }
@@ -21,8 +21,10 @@ export class Tile{
         svgElement.appendChild(this.useElement);
     }
 
+
     updateHTMLElement(tileType){
-        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + tileType.ID);
+        this.tileType = tileType;
+        this.useElement.setAttributeNS('http://www.w3.org/1999/xlink','href',"#" + tileType.id);
     }
 
     removeHTMLElementFromDom(){
