@@ -2,7 +2,6 @@ export class Tile{
     _content;
 
     constructor(x, y, grid){
-        this._content = content;
         this.x = x;
         this.y = y;
         this.grid = grid;
