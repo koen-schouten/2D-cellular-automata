@@ -29,7 +29,7 @@ export class Tile{
     }
 
     getWestTile(){
-        return this.grid.getTile(this.x - 1, this.y - 1)
+        return this.grid.getTile(this.x - 1, this.y)
     }
 
     getNorthEastTile(){
