@@ -11,6 +11,7 @@ export class BaseCellularAutomaton{
     updateState(){
         if(this.nextState != this.state){
             this.state = this.nextState;
+            this.nextState = null;
             //update observers
             this.fire();
         }

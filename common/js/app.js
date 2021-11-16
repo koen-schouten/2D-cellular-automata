@@ -1,8 +1,8 @@
 import { svgGrid } from './views/SVGGrid.js';
 import { automatonGrid } from './CellularAutomatons/AutomatonGrid.js';
-import { GameOfLife } from './CellularAutomatons/GameOfLife.js';
+import { GameOfLife } from './CellularAutomatons/gameOfLife/GameOfLife.js';
 
-const gridSize = 500;
+const gridSize = 250;
 
 function init() {
     const gridHolderElement = document.getElementById("gridHolder");

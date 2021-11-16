@@ -41,7 +41,7 @@ const automatonGrid = (function () {
 
     function updateGrid(){
         //For each tile get the next state 
-        tiles.forEach((tile, index) => tile.getContent().setNextState());
+        tiles.forEach((tile, index) => tile.getContent().stepUpdate());
         //Update all the tiles with this new state
         tiles.forEach((tile, index) => tile.getContent().updateState())
     }

@@ -1,4 +1,4 @@
-import { BaseCellularAutomaton } from "./BaseCellularAutomaton.js";
+import { BaseCellularAutomaton } from "../BaseCellularAutomaton.js";
 
 export class GameOfLife extends BaseCellularAutomaton{
     static optionDict = {
@@ -24,7 +24,7 @@ export class GameOfLife extends BaseCellularAutomaton{
         this.state = this.states[Math.floor(Math.random()*this.states.length)];
     }
     
-    setNextState(){
+    stepUpdate(){
         this.nextState = this.state;
         let neighbours = this.tile.getNeighbourTiles().map(tile => tile.getContent());
         let aliveNeighbourCount = neighbours.filter(neighbour => neighbour.state ==  "ALIVE").length
