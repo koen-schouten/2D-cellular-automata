@@ -1,52 +1,46 @@
 import { BaseCellularAutomaton } from "./BaseCellularAutomaton.js";
 
 export class GameOfLife extends BaseCellularAutomaton{
-
     static optionDict = {
-
     }
     static TILE_STYLES = {
+        "DEATH" : {
+            strokeWidth: 0,
+            strokeColor : "#fff",
+            fillColor : "#fff"
+        },
         "ALIVE" : {
             strokeWidth: 0,
             strokeColor : "blue",
             fillColor : "blue"
         },
-        "DEATH" : {
-            strokeWidth: 0,
-            strokeColor : "#fff",
-            fillColor : "#fff"
-        }
     }
-
-
-    static STATE_ALIVE = "ALIVE";
-    static STATE_DEATH = "DEATH"; 
-    static STATES = [this.STATE_ALIVE, this.STATE_DEATH]
 
     constructor(tile, options){
         super(tile)
+        this.tile_styles = GameOfLife.TILE_STYLES
+        this.states = Object.keys(this.tile_styles);
         //TODO change this from random to an argument from constructor
-        this.state = GameOfLife.STATES[Math.floor(Math.random()*GameOfLife.STATES.length)];
+        this.state = this.states[Math.floor(Math.random()*this.states.length)];
     }
     
-    getNextState(){
-        let newState = this.state;
+    setNextState(){
+        this.nextState = this.state;
         let neighbours = this.tile.getNeighbourTiles().map(tile => tile.getContent());
-        let aliveNeighbourCount = neighbours.filter(neighbour => neighbour.state == GameOfLife.STATE_ALIVE).length
+        let aliveNeighbourCount = neighbours.filter(neighbour => neighbour.state ==  "ALIVE").length
         
         //Any live cell with fewer than two live neighbours dies, as if by underpopulation.
         if(aliveNeighbourCount <= 1){
-            newState = GameOfLife.STATE_DEATH;
+            this.nextState = "DEATH";
         }
         //Any live cell with more than three live neighbours dies, as if by overpopulation.
         if(aliveNeighbourCount == 3){
-            newState = GameOfLife.STATE_ALIVE;
+            this.nextState = "ALIVE";
         }
         //Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
         if(aliveNeighbourCount >= 4){
-            newState = GameOfLife.STATE_DEATH;
+            this.nextState = "DEATH";
         }
-        return newState;
     }
 
 }

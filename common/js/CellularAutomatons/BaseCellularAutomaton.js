@@ -1,5 +1,6 @@
 export class BaseCellularAutomaton{
     state;
+    nextState;
 
     observerhandlers = [];
 
@@ -7,9 +8,9 @@ export class BaseCellularAutomaton{
         this.tile = tile;
     }
 
-    updateState(newState){
-        if(newState != this.state){
-            this.state = newState;
+    updateState(){
+        if(this.nextState != this.state){
+            this.state = this.nextState;
             //update observers
             this.fire();
         }
