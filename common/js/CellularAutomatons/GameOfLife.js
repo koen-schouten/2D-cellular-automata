@@ -42,23 +42,18 @@ export class GameOfLife extends BaseCellularAutomaton{
         let neighbours = this.tile.getNeighbourTiles().map(tile => tile.getContent());
         let aliveNeighbourCount = neighbours.filter(neighbour => neighbour.state == GameOfLife.STATE_ALIVE).length
         
-        if(this.state == GameOfLife.STATE_ALIVE){
-            //Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-            if(aliveNeighbourCount < 2){
-                newState = GameOfLife.STATE_DEATH;
-            }
-            //Any live cell with more than three live neighbours dies, as if by overpopulation.
-            else if(aliveNeighbourCount > 3){
-                newState = GameOfLife.STATE_DEATH;
-            }
-            
-        }else if(this.state == GameOfLife.STATE_DEATH){
-            //Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-            if(aliveNeighbourCount == 3){
-                newState = GameOfLife.STATE_ALIVE;
-            }
+        //Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+        if(aliveNeighbourCount <= 1){
+            newState = GameOfLife.STATE_DEATH;
         }
-
+        //Any live cell with more than three live neighbours dies, as if by overpopulation.
+        if(aliveNeighbourCount == 3){
+            newState = GameOfLife.STATE_ALIVE;
+        }
+        //Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+        if(aliveNeighbourCount >= 4){
+            newState = GameOfLife.STATE_DEATH;
+        }
         return newState;
     }
 
