@@ -29,14 +29,6 @@ export class GameOfLife extends BaseCellularAutomaton{
         this.state = GameOfLife.STATES[Math.floor(Math.random()*GameOfLife.STATES.length)];
     }
     
-    updateState(newState){
-        if(newState != this.state){
-            this.state = newState;
-            //update observers
-            this.fire();
-        }
-    }
-
     getNextState(){
         let newState = this.state;
         let neighbours = this.tile.getNeighbourTiles().map(tile => tile.getContent());

@@ -7,6 +7,14 @@ export class BaseCellularAutomaton{
         this.tile = tile;
     }
 
+    updateState(newState){
+        if(newState != this.state){
+            this.state = newState;
+            //update observers
+            this.fire();
+        }
+    }
+
     subscribe(fn){
         this.observerhandlers.push(fn);
         //call when subscribing to get initial data
