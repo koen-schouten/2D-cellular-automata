@@ -14,10 +14,6 @@ function init() {
     attachAutomatonObservers(automatonGrid, svgGrid);
     svgGrid.setViewBox(50, 50, 5, 5);
 
-
-    document.getElementById("updateButton").addEventListener("click", (e) =>{
-        automatonGrid.updateGrid();
-    })
     runGame(automatonGrid)
 }
 
